@@ -8,5 +8,6 @@ def index(request):
     context_dict = {'boldmessage':"I am bold font from the context"}
     # return HttpResponse("Rango says hey there world!<br/><a href='/rango/about'>About</a>")
     return render(request,'rango/index.html',context_dict)
-def about(reuest):
-    return HttpResponse("Rango says here is the about page!<br/><a href='/rango'>Index</a>")
+def about(request):
+    context_dict = {'aboutmessage': "Here is the about page!"}
+    return render(request,'rango/about.html',context_dict)
