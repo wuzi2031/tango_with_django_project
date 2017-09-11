@@ -12,6 +12,7 @@
         {% for foo in categories %}
             <li><a href="/rango/category/{{ foo.slug }}">{{ foo.name }}</a></li>
         {% endfor %}
+        <li><a href="/rango/category/Non-existent">Non-existent</a></li>
     </ul>
 {% else %}
     <strong>There are no categories present!</strong>
