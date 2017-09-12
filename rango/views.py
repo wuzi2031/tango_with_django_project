@@ -3,8 +3,9 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-from rango.models import Category, Page
-from rango.form import CategoryForm, PageForm
+from rango.models import Category, Page, UserProfile
+from django.contrib.auth.models import User
+from rango.form import CategoryForm, PageForm, UserForm, UserProfileForm
 
 
 def index(request):
@@ -71,3 +72,31 @@ def add_page(request, category_name_slug):
     dict['form'] = form
     dict['category'] = cat
     return render(request, 'rango/add_page.html', dict)
+
+
+def register(request):
+    dict = {}
+    registed = False
+    if (request.method == 'POST'):
+        user_form = UserForm(data=request.POST)
+        profile_form = UserProfileForm(data=request.POST)
+        if (user_form.is_valid() and profile_form.is_valid()):
+            user = user_form.save()
+            user.set_password(user.password)
+            user.save()
+
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            if ('picture' in request.FILES):
+                profile.picture = request.FILES['picture']
+            profile.save()
+            registed = True
+        else:
+            print user_form.errors, profile_form.errors
+    else:
+        user_form = UserForm()
+        profile_form = UserProfileForm()
+    dict['user_form'] = user_form
+    dict['profile_form'] = profile_form
+    dict['registed'] = registed
+    return render(request, 'rango/register.html', dict)

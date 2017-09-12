@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from rango.models import Category, Page
+from rango.models import Category, Page, UserProfile
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -16,3 +16,4 @@ class PageAdmin(admin.ModelAdmin):
 # Register your models here.
 admin.site.register(Category, admin_class=CategoryAdmin)
 admin.site.register(Page, admin_class=PageAdmin)
+admin.site.register(UserProfile)
