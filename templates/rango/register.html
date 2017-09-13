@@ -11,7 +11,7 @@
     <a href="/rango">Return to the homepage!</a>
 {% else %}
     Rango says: <strong>register here!</strong><br/>
-    <form id="user_form" method="post" action="/rango/register" enctype="multipart/form-data">
+    <form id="user_form" method="post" action="/rango/register/" enctype="multipart/form-data">
         {% csrf_token %}
         {{ user_form.as_p }}
         {{ profile_form.as_p }}
