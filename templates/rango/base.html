@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% block title_block %}
+    {% endblock %}
+</head>
+<body>
+{% block body_block %}
+{% endblock %}
+<ul>
+    <li><a href="{% url 'add_category' %}">Add a new category</a></li>
+    <li><a href="{% url 'about' %}">About</a></li>
+    <li><a href="{% url 'index' %}">Index</a></li>
+    <li><a href="{% url 'register' %}">Register</a></li>
+    <li><a href="{% url 'login' %}">Login</a></li>
+</ul>
+</body>
+</html>
