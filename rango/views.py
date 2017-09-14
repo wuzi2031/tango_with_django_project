@@ -1,22 +1,40 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
-from rango.models import Category, Page, UserProfile
-from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render
+from datetime import datetime
 from rango.form import CategoryForm, PageForm, UserForm, UserProfileForm
+from rango.models import Category, Page
 
+def visitor_cookie_handler(request,response):
+    visits =int(request.COOKIES.get('visits','1'))
+    last_visit_cookie = request.COOKIES.get('last_visit',str(datetime.now()))
+    last_visit_time = datetime.strptime(last_visit_cookie[:-7],'%Y-%m-%d %H:%M:%S')
+    if((datetime.now()-last_visit_time).seconds>0):
+        visits +=1
+        response.set_cookie('last_visit',str(datetime.now()))
+    else:
+        response.set_cookie('last_visit',last_visit_cookie)
+    response.set_cookie('visits',str(visits))
 
 def index(request):
     # context_dict = {'boldmessage': "I am bold font from the context"}
     # return HttpResponse("Rango says hey there world!<br/><a href='/rango/about'>About</a>")
+    request.session.set_test_cookie()
     category_list = Category.objects.order_by('-likes')[:5]
     context_dict = {'categories': category_list}
+    visitor_cookie_handler(request,response)
     return render(request, 'rango/index.html', context_dict)
 
 
 def about(request):
+    if request.session.test_cookie_worked():
+        print("TEST COOKIE WORKED!")
+    request.session.delete_test_cookie()
     context_dict = {'aboutmessage': "Here is the about page!"}
     return render(request, 'rango/about.html', context_dict)
 
@@ -100,3 +118,31 @@ def register(request):
     dict['profile_form'] = profile_form
     dict['registed'] = registed
     return render(request, 'rango/register.html', dict)
+
+
+def user_login(request):
+    if (request.method == 'POST'):
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(username=username, password=password)
+        if (user):
+            if (user.is_active):
+                login(request, user)
+                return HttpResponseRedirect(reverse('index'))
+            else:
+                return HttpResponse("Your Rango account is disabled.")
+        else:
+            print("Invalid login details: {0}, {1}".format(username, password))
+            return HttpResponse("Invalid login details supplied.")
+    else:
+        return render(request, 'rango/user_login.html', {})
+
+
+@login_required
+def restricted(request):
+    return HttpResponse("Since you're logged in, you can see this text!")
+
+@login_required
+def user_logout(request):
+    logout(request)
+    return index(request)
